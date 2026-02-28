@@ -10,11 +10,11 @@ class VaRCalculator:
         self.confidence_level = confidence_level
     
     def historical_var(self, returns, weights, portfolio_value=1000000):
-        """历史模拟法计算VaR"""
-        # 计算投资组合收益率
+        """Calcul de la VaR par simulation historique"""
+        # Calcul du rendement du portefeuille
         portfolio_returns = (returns * weights).sum(axis=1)
         
-        # 计算VaR
+        # Calcul de la VaR
         var_historical = -np.percentile(portfolio_returns, 
                                       (1 - self.confidence_level) * 100)
         var_historical_value = var_historical * portfolio_value
@@ -26,15 +26,15 @@ class VaRCalculator:
         }
     
     def parametric_var(self, returns, weights, portfolio_value=1000000):
-        """参数法计算VaR（方差-协方差方法）"""
-        # 计算投资组合收益率
+        """Calcul de la VaR paramétrique (méthode variance-covariance)"""
+        # Calcul du rendement du portefeuille
         portfolio_returns = (returns * weights).sum(axis=1)
         
-        # 计算均值和标准差
+        # Calcul de la moyenne et de l'écart-type
         mean_return = portfolio_returns.mean()
         std_return = portfolio_returns.std()
         
-        # 计算VaR（使用正态分布）
+        # Calcul de la VaR (en utilisant la distribution normale)
         z_score = stats.norm.ppf(self.confidence_level)
         var_parametric = -(mean_return - z_score * std_return)
         var_parametric_value = var_parametric * portfolio_value
@@ -47,11 +47,11 @@ class VaRCalculator:
         }
     
     def calculate_expected_shortfall(self, portfolio_returns, portfolio_value=1000000):
-        """计算Expected Shortfall (CVaR)"""
+        """Calcul de l'Expected Shortfall (CVaR)"""
         var_threshold = -np.percentile(portfolio_returns, 
                                      (1 - self.confidence_level) * 100)
         
-        # 找到超过VaR的损失
+        # Recherche des pertes dépassant la VaR
         tail_losses = portfolio_returns[portfolio_returns <= -var_threshold]
         
         if len(tail_losses) > 0:
@@ -68,7 +68,7 @@ class VaRCalculator:
         }
     
     def calculate_portfolio_stats(self, returns, weights, portfolio_value=1000000):
-        """计算投资组合统计信息"""
+        """Calcul des statistiques du portefeuille"""
         portfolio_returns = (returns * weights).sum(axis=1)
         
         stats_dict = {
