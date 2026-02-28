@@ -16,5 +16,5 @@ Ce système complet d'analyse de la Value-at-Risk (VaR) permet de mesurer le ris
 ```bash
 pip install -r requirements.txt
 ```
-![VaR分布图](images.png)
-![VaR分布图](image.png)
+![VaR分布图](image/images.png)
+![VaR分布图](image/image.png)
