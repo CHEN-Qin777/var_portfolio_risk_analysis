@@ -1,17 +1,18 @@
-# 多资产投资组合VaR风险分析系统
+# Système d'analyse de la VaR pour portefeuille multi-actifs
 
-## 项目概述
-这是一个完整的Value-at-Risk (VaR) 分析系统，用于多资产投资组合的风险度量。项目实现了三种主要的VaR计算方法，并提供了丰富的可视化和报告功能。
+## Présentation du projet
+Ce système complet d'analyse de la Value-at-Risk (VaR) permet de mesurer le risque d'un portefeuille multi-actifs. Le projet implémente trois méthodes principales de calcul de la VaR et propose des visualisations interactives ainsi qu'un générateur de rapports.
 
-## 功能特性
-- ✅ 历史模拟法VaR计算
-- ✅ 参数法（方差-协方差）VaR计算  
-- ✅ 蒙特卡洛模拟法VaR计算
-- ✅ Expected Shortfall (CVaR) 计算
-- ✅ 交互式可视化仪表板
-- ✅ 自动报告生成（文本和LaTeX格式）
-- ✅ 单元测试覆盖
+## Fonctionnalités
+- ✅ Calcul de la VaR par simulation historique
+- ✅ Calcul de la VaR paramétrique (variance-covariance)
+- ✅ Calcul de la VaR par simulation Monte Carlo
+- ✅ Calcul de l'Expected Shortfall (CVaR)
+- ✅ Tableau de bord interactif
+- ✅ Génération automatique de rapports (format texte et LaTeX)
+- ✅ Tests unitaires
 
-## 安装要求
+## Installation
 ```bash
 pip install -r requirements.txt
+```
