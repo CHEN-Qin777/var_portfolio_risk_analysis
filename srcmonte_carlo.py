@@ -13,21 +13,21 @@ class MonteCarloSimulator:
         np.random.seed(random_seed)
     
     def simulate_gbm(self, returns, weights, initial_portfolio_value=1000000):
-        """使用几何布朗运动进行蒙特卡洛模拟"""
-        # 计算投资组合收益率
+        """Simulation Monte-Carlo utilisant le mouvement brownien géométrique"""
+        # Calcul du rendement du portefeuille
         portfolio_returns = (returns * weights).sum(axis=1)
         
-        # 计算参数
+        # Calcul des paramètres
         mean_return = portfolio_returns.mean()
         std_return = portfolio_returns.std()
-        dt = 1  # 每天
+        dt = 1  # quotidien
         
-        # 生成随机路径
+        # Génération des trajectoires aléatoires
         simulations = np.zeros((self.time_horizon, self.n_simulations))
         simulations[0] = initial_portfolio_value
         
         for t in range(1, self.time_horizon):
-            # 生成随机 shocks
+            # Génération des chocs aléatoires
             shocks = np.random.normal(mean_return * dt, 
                                     std_return * np.sqrt(dt), 
                                     self.n_simulations)
@@ -36,15 +36,15 @@ class MonteCarloSimulator:
         return simulations
     
     def monte_carlo_var(self, simulations, confidence_level=0.95):
-        """基于蒙特卡洛模拟计算VaR"""
-        # 计算最终价值分布
+        """Calcul de la VaR basée sur la simulation Monte-Carlo"""
+        # Calcul de la distribution des valeurs finales
         final_values = simulations[-1, :]
         
-        # 计算损益
+        # Calcul des profits/pertes (P&L)
         initial_value = simulations[0, 0]
         pnl = final_values - initial_value
         
-        # 计算VaR
+        # Calcul de la VaR
         var_mc = -np.percentile(pnl, (1 - confidence_level) * 100)
         var_mc_percentage = var_mc / initial_value
         
@@ -57,15 +57,15 @@ class MonteCarloSimulator:
         }
     
     def correlated_mc_simulation(self, returns, weights, initial_portfolio_value=1000000):
-        """考虑资产相关性的蒙特卡洛模拟"""
-        # 计算协方差矩阵
+        """Simulation Monte-Carlo prenant en compte la corrélation des actifs"""
+        # Calcul de la matrice de covariance
         cov_matrix = returns.cov()
         
-        # Cholesky分解
+        # Décomposition de Cholesky
         try:
             L = np.linalg.cholesky(cov_matrix)
         except np.linalg.LinAlgError:
-            # 如果矩阵不是正定的，使用最近的正定矩阵
+            # Si la matrice n'est pas définie positive, utiliser la matrice définie positive la plus proche
             from sklearn.covariance import ledoit_wolf
             cov_matrix = ledoit_wolf(returns)[0]
             L = np.linalg.cholesky(cov_matrix)
@@ -73,17 +73,17 @@ class MonteCarloSimulator:
         n_assets = len(weights)
         dt = 1
         
-        # 生成相关随机数
+        # Génération des nombres aléatoires corrélés
         simulations = np.zeros((self.time_horizon, self.n_simulations, n_assets))
         portfolio_values = np.zeros((self.time_horizon, self.n_simulations))
         
         for i in range(self.n_simulations):
-            # 生成独立随机数
+            # Génération des nombres aléatoires indépendants
             Z = np.random.normal(0, 1, (self.time_horizon, n_assets))
-            # 转换为相关随机数
+            # Conversion en nombres aléatoires corrélés
             correlated_Z = Z @ L.T
             
-            # 模拟每个资产的价格路径
+            # Simulation des trajectoires de prix pour chaque actif
             asset_paths = np.zeros((self.time_horizon, n_assets))
             asset_paths[0] = initial_portfolio_value * np.array(list(weights.values()))
             
