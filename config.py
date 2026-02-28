@@ -2,19 +2,19 @@
 import pandas as pd
 from datetime import datetime, timedelta
 
-# 分析参数配置
+# Configuration des paramètres d'analyse
 class Config:
-    # 时间范围
+    # Période
     START_DATE = (datetime.now() - timedelta(days=5*365)).strftime('%Y-%m-%d')
     END_DATE = datetime.now().strftime('%Y-%m-%d')
     
-    # VaR参数
+    # Paramètres de la VaR
     CONFIDENCE_LEVEL = 0.95
     TIME_HORIZON = 1  # 天
     MONTE_CARLO_SIMULATIONS = 10000
     MONTE_CARLO_DAYS = 252
     
-    # 资产配置
+    # Répartition des actifs
     DEFAULT_PORTFOLIO = {
         'AAPL': 0.25,   # Apple
         'MSFT': 0.20,   # Microsoft
@@ -24,5 +24,6 @@ class Config:
         'SPY': 0.15     # S&P 500 ETF
     }
     
-    # 随机种子
+    # Graine aléatoire
+
     RANDOM_SEED = 42
