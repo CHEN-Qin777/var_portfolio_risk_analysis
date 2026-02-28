@@ -9,7 +9,7 @@ import pandas as pd
 import warnings
 warnings.filterwarnings('ignore')
 
-# 设置matplotlib样式
+# Configuration du style matplotlib
 plt.style.use('seaborn-v0_8')
 sns.set_palette("husl")
 
@@ -18,25 +18,25 @@ class RiskVisualizer:
         self.fig_size = (12, 8)
     
     def plot_returns_distribution(self, returns, var_results, save_path=None):
-        """绘制收益率分布和VaR"""
+        """Trace la distribution des rendements et la VaR"""
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
         
-        # 左图：收益率分布直方图
+        # Graphique de gauche : histogramme de la distribution des rendements
         ax1.hist(returns, bins=50, alpha=0.7, density=True, edgecolor='black')
         ax1.axvline(-var_results['historical']['var'], color='red', 
                    linestyle='--', linewidth=2, label=f"VaR {var_results['confidence_level']*100}%")
         ax1.axvline(-var_results['expected_shortfall']['es'], color='darkred', 
                    linestyle='--', linewidth=2, label='Expected Shortfall')
-        ax1.set_xlabel('日收益率')
-        ax1.set_ylabel('频率')
-        ax1.set_title('投资组合收益率分布与风险度量')
+        ax1.set_xlabel('Rendement journalier')
+        ax1.set_ylabel('Fréquence')
+        ax1.set_title('Distribution des rendements du portefeuille et mesures de risque')
         ax1.legend()
         ax1.grid(True, alpha=0.3)
         
-        # 右图：QQ图检验正态性
+        # Graphique de droite : QQ-plot pour tester la normalité
         from scipy import stats
         stats.probplot(returns, dist="norm", plot=ax2)
-        ax2.set_title('收益率QQ图（正态性检验）')
+        ax2.set_title('QQ-plot des rendements (test de normalité)')
         
         plt.tight_layout()
         if save_path:
@@ -44,30 +44,30 @@ class RiskVisualizer:
         plt.show()
     
     def plot_monte_carlo_simulations(self, mc_results, save_path=None):
-        """绘制蒙特卡洛模拟结果"""
+        """Trace les résultats de la simulation Monte-Carlo"""
         simulations = mc_results['simulations']
         
         plt.figure(figsize=self.fig_size)
         
-        # 绘制部分模拟路径
+        # Tracer un échantillon de trajectoires
         n_paths_to_plot = 100
         for i in range(min(n_paths_to_plot, simulations.shape[1])):
             plt.plot(simulations[:, i], alpha=0.1, color='blue')
         
-        # 绘制平均路径和VaR水平
+        # Tracer la trajectoire moyenne et le niveau de VaR
         mean_path = simulations.mean(axis=1)
         initial_value = simulations[0, 0]
         var_level = initial_value * (1 - mc_results['var'])
         
-        plt.plot(mean_path, color='red', linewidth=2, label='平均路径')
+        plt.plot(mean_path, color='red', linewidth=2, label='Trajectoire moyenne')
         plt.axhline(var_level, color='darkred', linestyle='--', 
                    linewidth=2, label=f"VaR {mc_results['confidence_level']*100}%")
         plt.axhline(initial_value, color='green', linestyle='-', 
-                   linewidth=2, label='初始价值')
+                   linewidth=2, label='Valeur initiale')
         
-        plt.xlabel('时间（天）')
-        plt.ylabel('投资组合价值')
-        plt.title('蒙特卡洛模拟 - 投资组合价值路径')
+        plt.xlabel('Temps (jours)')
+        plt.ylabel('Valeur du portefeuille')
+        plt.title('Simulation Monte-Carlo - Trajectoires de la valeur du portefeuille')
         plt.legend()
         plt.grid(True, alpha=0.3)
         
@@ -76,8 +76,8 @@ class RiskVisualizer:
         plt.show()
     
     def plot_var_comparison(self, var_results, save_path=None):
-        """比较不同方法的VaR结果"""
-        methods = ['Historical', 'Parametric', 'Monte Carlo']
+        """Compare les résultats de VaR obtenus par différentes méthodes"""
+        methods = ['Historique', 'Paramétrique', 'Monte Carlo']
         var_values = [
             var_results['historical']['var_value'],
             var_results['parametric']['var_value'],
@@ -87,13 +87,13 @@ class RiskVisualizer:
         plt.figure(figsize=(10, 6))
         bars = plt.bar(methods, var_values, color=['skyblue', 'lightcoral', 'lightgreen'])
         
-        plt.ylabel('VaR (金额)')
-        plt.title('不同VaR计算方法比较')
+        plt.ylabel('VaR (en valeur)')
+        plt.title('Comparaison des méthodes de calcul de la VaR')
         
-        # 在柱子上添加数值标签
+        # Ajouter des étiquettes de valeur sur les barres
         for bar, value in zip(bars, var_values):
             plt.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 1000,
-                    f'${value:,.0f}', ha='center', va='bottom')
+                    f'{value:,.0f} $', ha='center', va='bottom')
         
         plt.grid(True, alpha=0.3, axis='y')
         
@@ -102,29 +102,29 @@ class RiskVisualizer:
         plt.show()
     
     def plot_interactive_var_analysis(self, returns, var_results, mc_results):
-        """创建交互式可视化（Plotly）"""
+        """Crée une visualisation interactive (Plotly)"""
         fig = make_subplots(
             rows=2, cols=2,
-            subplot_titles=('收益率分布与VaR', '蒙特卡洛模拟',
-                          'VaR方法比较', '回测分析'),
+            subplot_titles=('Distribution des rendements et VaR', 'Simulation Monte-Carlo',
+                          'Comparaison des méthodes VaR', 'Analyse de backtest'),
             specs=[[{"secondary_y": False}, {"secondary_y": False}],
                    [{"secondary_y": False}, {"secondary_y": False}]]
         )
         
-        # 收益率分布
+        # Distribution des rendements
         hist_data = returns
         fig.add_trace(
-            go.Histogram(x=hist_data, nbinsx=50, name="收益率分布",
+            go.Histogram(x=hist_data, nbinsx=50, name="Distribution des rendements",
                         opacity=0.7, marker_color='blue'),
             row=1, col=1
         )
         
-        # VaR线
+        # Ligne VaR
         var_line = -var_results['historical']['var']
         fig.add_vline(x=var_line, line_dash="dash", line_color="red",
-                     annotation_text=f"VaR 95%: {var_line:.4f}", row=1, col=1)
+                     annotation_text=f"VaR 95% : {var_line:.4f}", row=1, col=1)
         
-        # 蒙特卡洛模拟（显示部分路径）
+        # Simulation Monte-Carlo (affichage d'un sous-ensemble de trajectoires)
         simulations = mc_results['simulations']
         for i in range(min(50, simulations.shape[1])):
             fig.add_trace(
@@ -134,15 +134,15 @@ class RiskVisualizer:
                 row=1, col=2
             )
         
-        # 平均路径
+        # Trajectoire moyenne
         fig.add_trace(
             go.Scatter(y=simulations.mean(axis=1), mode='lines',
-                      line=dict(width=3, color='red'), name='平均路径'),
+                      line=dict(width=3, color='red'), name='Trajectoire moyenne'),
             row=1, col=2
         )
         
-        # VaR比较
-        methods = ['Historical', 'Parametric', 'Monte Carlo']
+        # Comparaison VaR
+        methods = ['Historique', 'Paramétrique', 'Monte Carlo']
         var_values = [
             var_results['historical']['var_value'],
             var_results['parametric']['var_value'],
@@ -150,10 +150,11 @@ class RiskVisualizer:
         ]
         
         fig.add_trace(
-            go.Bar(x=methods, y=var_values, name='VaR比较',
+            go.Bar(x=methods, y=var_values, name='Comparaison VaR',
                   marker_color=['skyblue', 'lightcoral', 'lightgreen']),
             row=2, col=1
         )
         
-        fig.update_layout(height=800, title_text="投资组合风险分析仪表板")
+        fig.update_layout(height=800, title_text="Tableau de bord de l'analyse des risques du portefeuille")
+
         fig.show()
