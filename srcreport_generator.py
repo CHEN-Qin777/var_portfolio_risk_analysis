@@ -10,23 +10,23 @@ class ReportGenerator:
         self.timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
     def generate_summary_report(self, portfolio_data, var_results, portfolio_stats):
-        """生成风险分析摘要报告"""
+        """Génère un rapport de synthèse de l'analyse des risques"""
         
         report = {
             'timestamp': self.timestamp,
             'portfolio_summary': {
-                '资产数量': len(portfolio_data['weights']),
-                '投资组合价值': f"${portfolio_stats['portfolio_value']:,.2f}",
-                '年化波动率': f"{portfolio_stats['volatility'] * np.sqrt(252):.2%}",
-                '夏普比率': f"{portfolio_stats['sharpe_ratio']:.2f}",
+                'Nombre d\'actifs': len(portfolio_data['weights']),
+                'Valeur du portefeuille': f"${portfolio_stats['portfolio_value']:,.2f}",
+                'Volatilité annualisée': f"{portfolio_stats['volatility'] * np.sqrt(252):.2%}",
+                'Ratio de Sharpe': f"{portfolio_stats['sharpe_ratio']:.2f}",
             },
             'risk_metrics': {
-                '历史法VaR (95%)': f"${var_results['historical']['var_value']:,.2f}",
-                '历史法VaR (%)': f"{var_results['historical']['var']:.2%}",
-                '参数法VaR (95%)': f"${var_results['parametric']['var_value']:,.2f}",
-                '参数法VaR (%)': f"{var_results['parametric']['var']:.2%}",
-                '蒙特卡洛VaR (95%)': f"${var_results['monte_carlo']['var_value']:,.2f}",
-                '蒙特卡洛VaR (%)': f"{var_results['monte_carlo']['var']:.2%}",
+                'VaR historique (95%)': f"${var_results['historical']['var_value']:,.2f}",
+                'VaR historique (%)': f"{var_results['historical']['var']:.2%}",
+                'VaR paramétrique (95%)': f"${var_results['parametric']['var_value']:,.2f}",
+                'VaR paramétrique (%)': f"{var_results['parametric']['var']:.2%}",
+                'VaR Monte-Carlo (95%)': f"${var_results['monte_carlo']['var_value']:,.2f}",
+                'VaR Monte-Carlo (%)': f"{var_results['monte_carlo']['var']:.2%}",
                 'Expected Shortfall': f"${var_results['expected_shortfall']['es_value']:,.2f}",
                 'Expected Shortfall (%)': f"{var_results['expected_shortfall']['es']:.2%}",
             },
@@ -36,37 +36,37 @@ class ReportGenerator:
         return report
     
     def save_detailed_report(self, report_data, filename):
-        """保存详细报告到CSV"""
-        # 创建DataFrame用于报告
+        """Enregistre le rapport détaillé au format texte"""
+        # Création d'un DataFrame pour le rapport
         risk_df = pd.DataFrame.from_dict(report_data['risk_metrics'], 
-                                       orient='index', columns=['Value'])
+                                       orient='index', columns=['Valeur'])
         portfolio_df = pd.DataFrame.from_dict(report_data['portfolio_composition'], 
-                                            orient='index', columns=['Weight'])
+                                            orient='index', columns=['Poids'])
         
-        with open(filename, 'w') as f:
-            f.write("投资组合风险分析报告\n")
+        with open(filename, 'w', encoding='utf-8') as f:
+            f.write("Rapport d'analyse des risques du portefeuille\n")
             f.write("=" * 50 + "\n")
-            f.write(f"生成时间: {report_data['timestamp']}\n\n")
+            f.write(f"Généré le : {report_data['timestamp']}\n\n")
             
-            f.write("投资组合摘要:\n")
+            f.write("Résumé du portefeuille :\n")
             f.write("-" * 20 + "\n")
             for key, value in report_data['portfolio_summary'].items():
-                f.write(f"{key}: {value}\n")
+                f.write(f"{key} : {value}\n")
             
-            f.write("\n风险指标:\n")
+            f.write("\nIndicateurs de risque :\n")
             f.write("-" * 20 + "\n")
             for key, value in report_data['risk_metrics'].items():
-                f.write(f"{key}: {value}\n")
+                f.write(f"{key} : {value}\n")
             
-            f.write("\n资产配置:\n")
+            f.write("\nAllocation d'actifs :\n")
             f.write("-" * 20 + "\n")
             for asset, weight in report_data['portfolio_composition'].items():
-                f.write(f"{asset}: {weight:.1%}\n")
+                f.write(f"{asset} : {weight:.1%}\n")
         
-        print(f"详细报告已保存到: {filename}")
+        print(f"Rapport détaillé enregistré dans : {filename}")
     
     def generate_latex_report(self, report_data, filename):
-        """生成LaTeX格式的报告"""
+        """Génère un rapport au format LaTeX"""
         latex_content = f"""
 \\documentclass{{article}}
 \\usepackage[utf8]{{inputenc}}
@@ -74,31 +74,31 @@ class ReportGenerator:
 \\usepackage{{booktabs}}
 \\usepackage{{hyperref}}
 
-\\title{{投资组合风险分析报告}}
-\\author{{VaR分析系统}}
+\\title{{Rapport d'analyse des risques du portefeuille}}
+\\author{{Système d'analyse VaR}}
 \\date{{{report_data['timestamp']}}}
 
 \\begin{{document}}
 
 \\maketitle
 
-\\section{{执行摘要}}
-本报告提供了多资产投资组合的风险分析，使用多种方法计算了Value-at-Risk (VaR)。
+\\section{{Résumé exécutif}}
+Ce rapport fournit une analyse des risques pour un portefeuille multi-actifs, en calculant la Value-at-Risk (VaR) à l'aide de différentes méthodes.
 
-\\section{{投资组合信息}}
+\\section{{Informations sur le portefeuille}}
 \\begin{{itemize}}
-    \\item 资产数量: {report_data['portfolio_summary']['资产数量']}
-    \\item 投资组合价值: {report_data['portfolio_summary']['投资组合价值']}
-    \\item 年化波动率: {report_data['portfolio_summary']['年化波动率']}
-    \\item 夏普比率: {report_data['portfolio_summary']['夏普比率']}
+    \\item Nombre d'actifs : {report_data['portfolio_summary']['Nombre d\'actifs']}
+    \\item Valeur du portefeuille : {report_data['portfolio_summary']['Valeur du portefeuille']}
+    \\item Volatilité annualisée : {report_data['portfolio_summary']['Volatilité annualisée']}
+    \\item Ratio de Sharpe : {report_data['portfolio_summary']['Ratio de Sharpe']}
 \\end{{itemize}}
 
-\\section{{风险指标}}
+\\section{{Indicateurs de risque}}
 \\begin{{table}}[h]
 \\centering
 \\begin{{tabular}}{{lr}}
 \\toprule
-\\textbf{{指标}} & \\textbf{{数值}} \\\\
+\\textbf{{Indicateur}} & \\textbf{{Valeur}} \\\\
 \\midrule
 """
         
@@ -108,15 +108,15 @@ class ReportGenerator:
         latex_content += """
 \\bottomrule
 \\end{tabular}
-\\caption{风险指标汇总}
+\\caption{Récapitulatif des indicateurs de risque}
 \\end{table}
 
-\\section{资产配置}
+\\section{Allocation d'actifs}
 \\begin{table}[h]
 \\centering
 \\begin{tabular}{lr}
 \\toprule
-\\textbf{资产} & \\textbf{权重} \\\\
+\\textbf{Actif} & \\textbf{Poids} \\\\
 \\midrule
 """
         
@@ -126,7 +126,7 @@ class ReportGenerator:
         latex_content += """
 \\bottomrule
 \\end{tabular}
-\\caption{投资组合资产配置}
+\\caption{Allocation du portefeuille}
 \\end{table}
 
 \\end{document}
@@ -135,4 +135,4 @@ class ReportGenerator:
         with open(filename, 'w', encoding='utf-8') as f:
             f.write(latex_content)
         
-        print(f"LaTeX报告已保存到: {filename}")
+        print(f"Rapport LaTeX enregistré dans : {filename}")
