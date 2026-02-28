@@ -11,7 +11,7 @@ from var_calculator import VaRCalculator
 class TestVaRCalculator(unittest.TestCase):
     
     def setUp(self):
-        """设置测试数据"""
+        """Configure les données de test"""
         np.random.seed(42)
         self.returns = pd.DataFrame({
             'Asset1': np.random.normal(0.001, 0.02, 1000),
@@ -22,7 +22,7 @@ class TestVaRCalculator(unittest.TestCase):
         self.var_calculator = VaRCalculator(confidence_level=0.95)
     
     def test_historical_var(self):
-        """测试历史法VaR计算"""
+        """Teste le calcul de la VaR historique"""
         result = self.var_calculator.historical_var(
             self.returns, self.weights, self.portfolio_value
         )
@@ -32,7 +32,7 @@ class TestVaRCalculator(unittest.TestCase):
         self.assertGreater(result['var_value'], 0)
     
     def test_parametric_var(self):
-        """测试参数法VaR计算"""
+        """Teste le calcul de la VaR paramétrique"""
         result = self.var_calculator.parametric_var(
             self.returns, self.weights, self.portfolio_value
         )
@@ -44,7 +44,7 @@ class TestVaRCalculator(unittest.TestCase):
         self.assertGreater(result['var_value'], 0)
     
     def test_expected_shortfall(self):
-        """测试Expected Shortfall计算"""
+        """Teste le calcul de l'Expected Shortfall"""
         historical_result = self.var_calculator.historical_var(
             self.returns, self.weights, self.portfolio_value
         )
@@ -55,7 +55,7 @@ class TestVaRCalculator(unittest.TestCase):
         
         self.assertIn('es', es_result)
         self.assertIn('es_value', es_result)
-        # ES应该大于等于VaR
+        # ES devrait être supérieur ou égal à la VaR
         self.assertGreaterEqual(es_result['es_value'], historical_result['var_value'])
 
 if __name__ == '__main__':
