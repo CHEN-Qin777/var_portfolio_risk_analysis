@@ -1,3 +1,4 @@
+```python
 # src/data_loader.py
 import pandas as pd
 import numpy as np
@@ -12,8 +13,8 @@ class DataLoader:
         self.end_date = end_date
     
     def download_market_data(self, symbols):
-        """从Yahoo Finance下载市场数据"""
-        print(f"下载 {len(symbols)} 种资产的数据...")
+        """Télécharge les données de marché depuis Yahoo Finance"""
+        print(f"Téléchargement des données pour {len(symbols)} actifs...")
         data = {}
         
         for symbol in symbols:
@@ -22,33 +23,33 @@ class DataLoader:
                 hist_data = ticker.history(start=self.start_date, end=self.end_date)
                 if not hist_data.empty:
                     data[symbol] = hist_data['Close']
-                    print(f"✓ {symbol}: {len(hist_data)} 个数据点")
+                    print(f"✓ {symbol}: {len(hist_data)} points de données")
                 else:
-                    print(f"✗ {symbol}: 无数据")
+                    print(f"✗ {symbol}: Aucune donnée")
             except Exception as e:
-                print(f"✗ {symbol}: 错误 - {e}")
+                print(f"✗ {symbol}: Erreur - {e}")
         
         return pd.DataFrame(data)
     
     def calculate_returns(self, prices):
-        """计算日收益率"""
+        """Calcule les rendements quotidiens"""
         returns = prices.pct_change().dropna()
         return returns
     
     def generate_sample_data(self, symbols, portfolio_weights):
-        """生成示例数据"""
-        print("生成示例投资组合数据...")
+        """Génère des données d'exemple"""
+        print("Génération des données d'exemple du portefeuille...")
         
-        # 下载市场数据
+        # Téléchargement des données de marché
         prices = self.download_market_data(symbols)
         
         if prices.empty:
-            raise ValueError("无法下载市场数据")
+            raise ValueError("Impossible de télécharger les données de marché")
         
-        # 计算收益率
+        # Calcul des rendements
         returns = self.calculate_returns(prices)
         
-        # 创建投资组合数据
+        # Création des données du portefeuille
         portfolio_data = {
             'prices': prices,
             'returns': returns,
@@ -58,6 +59,7 @@ class DataLoader:
         return portfolio_data
     
     def save_data_to_csv(self, data, filename):
-        """保存数据到CSV"""
+        """Enregistre les données au format CSV"""
         data.to_csv(filename, index=True)
-        print(f"数据已保存到 {filename}")
+        print(f"Données enregistrées dans {filename}")
+```
